@@ -5,11 +5,13 @@ import connectDB from "./infrastructure/db.js";
 import hotelsRouter from "./api/hotel.js";
 import usersRouter from "./api/user.js";
 import bookingsRouter from "./api/booking.js";
+import cors from "cors";
 
 // Create an Express instance
 const app = express();
 // Middleware to parse JSON data in the request body
 app.use(express.json());
+app.use(cors());
 
 connectDB();
 
