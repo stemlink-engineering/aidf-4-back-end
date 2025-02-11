@@ -5,15 +5,9 @@ import {
   createHotel,
   deleteHotel,
   updateHotel,
-} from "../application/hotel.js";
+} from "./../application/hotel";
 
 const hotelsRouter = express.Router();
-
-// hotelsRouter.get("/", getAllHotels);
-// hotelsRouter.get("/:id", getHotelById);
-// hotelsRouter.post("/", createHotel);
-// hotelsRouter.delete("/:id", deleteHotel);
-// hotelsRouter.put("/:id", updateHotel);
 
 hotelsRouter.route("/").get(getAllHotels).post(createHotel);
 hotelsRouter
