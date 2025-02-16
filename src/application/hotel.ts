@@ -28,7 +28,7 @@ export const getHotelById = async (
   try {
     const hotelId = req.params.id;
     const hotel = await Hotel.findById(hotelId);
-    if (!hotel) {
+     if (!hotel) {
       throw new NotFoundError("Hotel not found");
     }
 
