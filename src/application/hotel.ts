@@ -28,7 +28,7 @@ export const getHotelById = async (
   try {
     const hotelId = req.params.id;
     const hotel = await Hotel.findById(hotelId);
-     if (!hotel) {
+    if (!hotel) {
       throw new NotFoundError("Hotel not found");
     }
 
@@ -50,8 +50,6 @@ export const createHotel = async (
     if (
       !hotel.name ||
       !hotel.location ||
-      !hotel.rating ||
-      !hotel.reviews ||
       !hotel.image ||
       !hotel.price ||
       !hotel.description
@@ -63,8 +61,6 @@ export const createHotel = async (
     await Hotel.create({
       name: hotel.name,
       location: hotel.location,
-      rating: parseFloat(hotel.rating),
-      reviews: parseInt(hotel.reviews),
       image: hotel.image,
       price: parseInt(hotel.price),
       description: hotel.description,
