@@ -1,6 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import Booking from "../infrastructure/schemas/Booking";
+import { CreateBookingDTO } from "../domain/dtos/booking";
+import ValidationError from "../domain/errors/validation-error";
+import { clerkClient } from "@clerk/express";
 
 export const createBooking = async (
   req: Request,
@@ -8,27 +11,22 @@ export const createBooking = async (
   next: NextFunction
 ) => {
   try {
-    const booking = req.body;
-
+    const booking = CreateBookingDTO.safeParse(req.body);
+    console.log(booking);
     // Validate the request data
-    if (
-      !booking.hotelId ||
-      !booking.userId ||
-      !booking.checkIn ||
-      !booking.checkOut ||
-      !booking.roomNumber
-    ) {
-        res.status(400).send();
-        return;
+    if (!booking.success) {
+      throw new ValidationError(booking.error.message)
     }
+
+    const user = req.auth;
 
     // Add the booking
     await Booking.create({
-      hotelId: booking.hotelId,
-      userId: booking.userId,
-      checkIn: booking.checkIn,
-      checkOut: booking.checkOut,
-      roomNumber: booking.roomNumber,
+      hotelId: booking.data.hotelId,
+      userId: user.userId,
+      checkIn: booking.data.checkIn,
+      checkOut: booking.data.checkOut,
+      roomNumber: booking.data.roomNumber,
     });
 
     // Return the response
@@ -46,9 +44,13 @@ export const getAllBookingsForHotel = async (
 ) => {
   try {
     const hotelId = req.params.hotelId;
-    const bookings = await Booking.find({ hotelId: hotelId }).populate("userId");
+    const bookings = await Booking.find({ hotelId: hotelId });
+    const bookingsWithUser = await Promise.all(bookings.map(async (el) => {
+      const user = await clerkClient.users.getUser(el.userId);
+      return { _id: el._id, hotelId: el.hotelId, checkIn: el.checkIn, checkOut: el.checkOut, roomNumber: el.roomNumber, user: { id: user.id, firstName: user.firstName, lastName: user.lastName } }
+    }))
 
-    res.status(200).json(bookings);
+    res.status(200).json(bookingsWithUser);
     return;
   } catch (error) {
     next(error);
@@ -62,6 +64,7 @@ export const getAllBookings = async (
 ) => {
   try {
     const bookings = await Booking.find();
+
     res.status(200).json(bookings);
     return;
   } catch (error) {

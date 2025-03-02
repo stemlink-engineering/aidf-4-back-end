@@ -1,3 +1,4 @@
+import { isAuthenticated } from './middlewares/authentication-middleware';
 import express from "express";
 import {
   createBooking,
@@ -7,7 +8,7 @@ import {
 
 const bookingsRouter = express.Router();
 
-bookingsRouter.route("/").post(createBooking).get(getAllBookings);
+bookingsRouter.route("/").post(isAuthenticated, createBooking).get(getAllBookings);
 bookingsRouter.route("/hotels/:hotelId").get(getAllBookingsForHotel);
 
 export default bookingsRouter;
