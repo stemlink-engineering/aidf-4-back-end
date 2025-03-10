@@ -2,6 +2,7 @@ import express from "express";
 import {
   createHotel,
   deleteHotel,
+  generateResponse,
   getAllHotels,
   getHotelById,
   updateHotel,
@@ -17,5 +18,6 @@ hotelsRouter
   .get(getHotelById)
   .put(updateHotel)
   .delete(deleteHotel);
+hotelsRouter.route("/llm").post(generateResponse);
 
 export default hotelsRouter;

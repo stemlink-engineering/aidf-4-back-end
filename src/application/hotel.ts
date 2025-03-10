@@ -5,6 +5,8 @@ import NotFoundError from "../domain/errors/not-found-error";
 import ValidationError from "../domain/errors/validation-error";
 import { CreateHotelDTO } from "../domain/dtos/hotel";
 
+import OpenAI from "openai";
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getAllHotels = async (
@@ -38,6 +40,39 @@ export const getHotelById = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const generateResponse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { prompt } = req.body;
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      // {
+      //   role: "system",
+      //   content:
+      //     "You are assistant that will categorize the words that a user gives and give them labels and show an output. Return this response as in the following examples: user: Lake, Cat, Dog, Tree; response: [{label:Nature, words:['Lake', 'Tree']}, {label:Animals, words:['Cat', 'Dog']}] ",
+      // },
+      { role: "user", content: prompt },
+    ],
+    store: true,
+  });
+
+  res.status(200).json({
+    message: {
+      role: "assistant",
+      content: completion.choices[0].message.content,
+    },
+  });
+  return;
 };
 
 export const createHotel = async (
