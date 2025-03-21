@@ -16,8 +16,6 @@ app.use(clerkMiddleware());
 app.use(express.json());
 app.use(cors());
 
-connectDB();
-
 // app.use((req, res, next) => {
 //   console.log("Hello World");
 //   next();
@@ -29,5 +27,7 @@ app.use("/api/bookings", bookingsRouter);
 app.use(globalErrorHandlingMiddleware);
 
 // Define the port to run the server
-const PORT = 8000;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}...`));
+connectDB();
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
