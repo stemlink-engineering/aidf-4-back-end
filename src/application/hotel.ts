@@ -6,6 +6,7 @@ import ValidationError from "../domain/errors/validation-error";
 import { CreateHotelDTO } from "../domain/dtos/hotel";
 
 import OpenAI from "openai";
+import stripe from "../infrastructure/stripe";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -75,33 +76,48 @@ export const generateResponse = async (
   return;
 };
 
-export const createHotel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createHotel = async (req: Request, res: Response) => {
   try {
-    const hotel = CreateHotelDTO.safeParse(req.body);
-    // Validate the request data
-
-    if (!hotel.success) {
-      throw new ValidationError(hotel.error.message);
+    // Validate input using Zod schema
+    const validationResult = CreateHotelDTO.safeParse(req.body);
+    
+    if (!validationResult.success) {
+      return res.status(400).json({ 
+        message: "Invalid hotel data", 
+        errors: validationResult.error.format() 
+      });
     }
-
-    // Add the hotel
-    await Hotel.create({
-      name: hotel.data.name,
-      location: hotel.data.location,
-      image: hotel.data.image,
-      price: parseInt(hotel.data.price),
-      description: hotel.data.description,
+    
+    const hotelData = validationResult.data;
+    
+    // Create a product in Stripe
+    const stripeProduct = await stripe.products.create({
+      name: hotelData.name,
+      description: hotelData.description,
+      default_price_data: {
+        unit_amount: Math.round(parseFloat(hotelData.price) * 100), // Convert to cents
+        currency: "usd",
+      },
     });
 
-    // Return the response
-    res.status(201).send();
-    return;
+    // Create the hotel with the Stripe price ID
+    const hotel = new Hotel({
+      name: hotelData.name,
+      location: hotelData.location,
+      image: hotelData.image,
+      price: hotelData.price,
+      description: hotelData.description,
+      stripePriceId: stripeProduct.default_price,
+    });
+
+    await hotel.save();
+    res.status(201).json(hotel);
   } catch (error) {
-    next(error);
+    console.error("Error creating hotel:", error);
+    res.status(500).json({ 
+      message: "Failed to create hotel", 
+      error: error instanceof Error ? error.message : String(error) 
+    });
   }
 };
 

@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const hotelSchema = new mongoose.Schema({
+const hotelSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -26,6 +26,10 @@ const hotelSchema = new mongoose.Schema({
     required: true,
   },
   description: {
+    type: String,
+    required: true,
+  },
+  stripePriceId: {
     type: String,
     required: true,
   },

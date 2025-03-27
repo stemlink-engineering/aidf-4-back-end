@@ -22,6 +22,16 @@ const bookingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  paymentStatus: {
+    type: String,
+    enum: ["PENDING", "PAID"],
+    default: "PENDING",
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["CARD", "BANK_TRANSFER"],
+    default: "CREDIT_CARD",
+  },
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
