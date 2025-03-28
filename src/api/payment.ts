@@ -5,7 +5,7 @@ import {
   retrieveSessionStatus,
 } from "../application/payment";
 import bodyParser from "body-parser";
-
+import { isAuthenticated } from "./middlewares/authentication-middleware";
 const paymentsRouter = express.Router();
 
 paymentsRouter.route("/create-checkout-session").post(createCheckoutSession);

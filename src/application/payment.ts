@@ -128,9 +128,15 @@ export const retrieveSessionStatus = async (req: Request, res: Response) => {
   if (!booking) {
     throw new Error("Booking not found");
   }
+  const hotel = await Hotel.findById(booking.hotelId);
+  if (!hotel) {
+    throw new Error("Hotel not found");
+  }
 
   res.status(200).json({
     bookingId: booking._id,
+    booking: booking,
+    hotel: hotel,
     status: checkoutSession.status,
     customer_email: checkoutSession.customer_details?.email,
     paymentStatus: booking.paymentStatus,

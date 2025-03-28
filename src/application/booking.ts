@@ -116,11 +116,7 @@ export const getBookingById = async (
     if (!booking) {
       throw new NotFoundError("Booking not found");
     }
-    const hotel = await Hotel.findById(booking.hotelId);
-    if (!hotel) {
-      throw new NotFoundError("Hotel not found");
-    }
-    res.status(200).json({ booking, hotel });
+    res.status(200).json(booking);
     return;
   } catch (error) {
     next(error);
