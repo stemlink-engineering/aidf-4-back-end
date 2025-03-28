@@ -80,16 +80,17 @@ export const createHotel = async (req: Request, res: Response) => {
   try {
     // Validate input using Zod schema
     const validationResult = CreateHotelDTO.safeParse(req.body);
-    
+
     if (!validationResult.success) {
-      return res.status(400).json({ 
-        message: "Invalid hotel data", 
-        errors: validationResult.error.format() 
+      res.status(400).json({
+        message: "Invalid hotel data",
+        errors: validationResult.error.format(),
       });
+      return;
     }
-    
+
     const hotelData = validationResult.data;
-    
+
     // Create a product in Stripe
     const stripeProduct = await stripe.products.create({
       name: hotelData.name,
@@ -114,9 +115,9 @@ export const createHotel = async (req: Request, res: Response) => {
     res.status(201).json(hotel);
   } catch (error) {
     console.error("Error creating hotel:", error);
-    res.status(500).json({ 
-      message: "Failed to create hotel", 
-      error: error instanceof Error ? error.message : String(error) 
+    res.status(500).json({
+      message: "Failed to create hotel",
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };
