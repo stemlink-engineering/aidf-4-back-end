@@ -30,7 +30,7 @@ const bookingSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     enum: ["CARD", "BANK_TRANSFER"],
-    default: "CREDIT_CARD",
+    default: "CARD",
   },
 });
 

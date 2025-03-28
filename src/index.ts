@@ -9,6 +9,7 @@ import hotelsRouter from "./api/hotel";
 import globalErrorHandlingMiddleware from "./api/middlewares/global-error-handling-middleware";
 import { handleWebhook } from "./application/payment";
 import bodyParser from "body-parser";
+import paymentsRouter from "./api/payment";
 // Create an Express instance
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(express.json());
 
 app.use("/api/hotels", hotelsRouter);
 app.use("/api/bookings", bookingsRouter);
+app.use("/api/payments", paymentsRouter);
 
 app.use(globalErrorHandlingMiddleware);
 
