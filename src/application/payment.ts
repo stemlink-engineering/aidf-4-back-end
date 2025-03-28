@@ -103,7 +103,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
         quantity: numberOfNights,
       }],
       mode: "payment",
-      return_url: `${FRONTEND_URL}/shop/complete?session_id={CHECKOUT_SESSION_ID}`,
+      return_url: `${FRONTEND_URL}/booking/complete?session_id={CHECKOUT_SESSION_ID}`,
       metadata: {
         bookingId: req.body.bookingId,
       },

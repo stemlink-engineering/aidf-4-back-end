@@ -5,6 +5,7 @@ import { CreateBookingDTO } from "../domain/dtos/booking";
 import ValidationError from "../domain/errors/validation-error";
 import { clerkClient } from "@clerk/express";
 import NotFoundError from "../domain/errors/not-found-error";
+import Hotel from "../infrastructure/schemas/Hotel";
 
 export const createBooking = async (
   req: Request,
@@ -115,7 +116,11 @@ export const getBookingById = async (
     if (!booking) {
       throw new NotFoundError("Booking not found");
     }
-    res.status(200).json(booking);
+    const hotel = await Hotel.findById(booking.hotelId);
+    if (!hotel) {
+      throw new NotFoundError("Hotel not found");
+    }
+    res.status(200).json({ booking, hotel });
     return;
   } catch (error) {
     next(error);
